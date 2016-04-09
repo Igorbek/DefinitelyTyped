@@ -15,15 +15,13 @@ function counter(state: any, action: any) {
 }
 
 function loggingMiddleware() {
-    return (next: Redux.Dispatch) => (action: any) => {
+    return <S>(next: Redux.Dispatch<S>) => (action: any) => {
         console.log(action.type);
         next(action);
     };
 }
 
-let createStoreWithMiddleware = Redux.applyMiddleware(loggingMiddleware)(Redux.createStore);
-let store = createStoreWithMiddleware(counter);
-
+let store = Redux.createStore(counter, Redux.applyMiddleware(loggingMiddleware));
 
 store.subscribe(() =>
     console.log(store.getState())

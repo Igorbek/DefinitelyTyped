@@ -7,8 +7,14 @@
 
 declare namespace ReduxThunk {
     export interface Thunk extends Redux.Middleware {}
-    export interface ThunkInterface {
-      <T>(dispatch: Redux.Dispatch, getState?: () => T): any;
+    export interface ThunkInterface<S, R> {
+      (dispatch: Redux.Dispatch<S>, getState?: () => S): R;
+    }
+}
+
+declare namespace Redux {
+    export interface Dispatch<S> {
+        <R>(asyncAction: ReduxThunk.ThunkInterface<S, R>): R;
     }
 }
 

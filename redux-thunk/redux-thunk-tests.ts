@@ -2,19 +2,15 @@
 /// <reference path="../redux/redux.d.ts" />
 /// <reference path="../express/express.d.ts" />
 
-import { createStore, applyMiddleware, Store, Dispatch } from 'redux';
+import { createStore, applyMiddleware, Store, Dispatch, Reducer } from 'redux';
 import thunk from 'redux-thunk';
 import ThunkInterface = ReduxThunk.ThunkInterface;
 
-declare var rootReducer: Function;
+declare var rootReducer: Reducer<any>;
 declare var fetch: any;
 
 // create a store that has redux-thunk middleware enabled
-const createStoreWithMiddleware = applyMiddleware(
-    thunk
-)(createStore);
-
-const store: Store = createStoreWithMiddleware(rootReducer);
+const store: Store<any> = createStore(rootReducer, applyMiddleware(thunk));
 
 function fetchSecretSauce() {
     return fetch('https://www.google.com/search?q=secret+sauce');
@@ -24,7 +20,7 @@ function fetchSecretSauce() {
 // The actions they return can be dispatched without any middleware.
 // However, they only express “facts” and not the “async flow”.
 
-function makeASandwich(forPerson: any, secretSauce?: any): any {
+function makeASandwich(forPerson: any, secretSauce?: any) {
     return {
         type: 'MAKE_SANDWICH',
         forPerson,
@@ -32,7 +28,7 @@ function makeASandwich(forPerson: any, secretSauce?: any): any {
     };
 }
 
-function apologize(fromPerson: any, toPerson?: any, error?: any): any {
+function apologize(fromPerson: any, toPerson?: any, error?: any) {
     return {
         type: 'APOLOGIZE',
         fromPerson,
@@ -41,7 +37,7 @@ function apologize(fromPerson: any, toPerson?: any, error?: any): any {
     };
 }
 
-function withdrawMoney(amount: number): any {
+function withdrawMoney(amount: number) {
     return {
         type: 'WITHDRAW',
         amount
@@ -58,13 +54,13 @@ store.dispatch(withdrawMoney(100));
 // A thunk is a function that returns a function.
 // This is a thunk.
 
-function makeASandwichWithSecretSauce(forPerson: any): ThunkInterface {
+function makeASandwichWithSecretSauce(forPerson: any) {
 
     // Invert control!
     // Return a function that accepts `dispatch` so we can dispatch later.
     // Thunk middleware knows how to turn thunk async actions into actions.
 
-    return function (dispatch: Dispatch): any {
+    return function (dispatch: Dispatch<any>) {
         return fetchSecretSauce().then(
             (sauce: any) => dispatch(makeASandwich(forPerson, sauce)),
             (error: any) => dispatch(apologize('The Sandwich Shop', forPerson, error))
@@ -92,8 +88,8 @@ store.dispatch(
 // actions and async actions from other action creators,
 // and I can build my control flow with Promises.
 
-function makeSandwichesForEverybody(): ThunkInterface {
-    return function (dispatch: Dispatch, getState: () => any): any {
+function makeSandwichesForEverybody() {
+    return function (dispatch: Dispatch<any>, getState: () => any): any {
         if (!getState().sandwiches.isShopOpen) {
 
             // You don’t have to return Promises, but it’s a handy convention
